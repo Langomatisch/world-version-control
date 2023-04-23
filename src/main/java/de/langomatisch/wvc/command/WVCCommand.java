@@ -1,7 +1,6 @@
 package de.langomatisch.wvc.command;
 
-import de.langomatisch.wvc.WVCPlugin;
-import de.langomatisch.wvc.git.GitWorldManager;
+import de.langomatisch.wvc.git.GitRepository;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,7 +32,7 @@ public class WVCCommand implements CommandExecutor {
     private void create(Player player) {
         World world = player.getWorld();
         player.sendMessage("Creating repository for world " + world.getName());
-        GitRepository repository = GitWorldManager.getInstance().createRepository(world);
+        GitRepository repository = GitRepository.createRepository(world);
         if (repository == null) {
             player.sendMessage("Repository already exists");
         } else {

@@ -1,6 +1,8 @@
 package de.langomatisch.wvc.git;
 
 import de.langomatisch.wvc.WVCPlugin;
+import de.langomatisch.wvc.git.action.create.GitCreateAction;
+import de.langomatisch.wvc.git.action.create.GitCreateContext;
 import lombok.Data;
 import org.bukkit.World;
 import org.kohsuke.github.GHRepository;
@@ -15,6 +17,44 @@ import java.util.concurrent.CompletableFuture;
 
 @Data
 public class GitRepository {
+
+    public static boolean isGitWorld(World world) {
+        if (world == null) {
+            throw new IllegalArgumentException("World cannot be null");
+        }
+        File worldFolder = world.getWorldFolder();
+        if (Arrays.stream(Objects.requireNonNull(worldFolder.listFiles()))
+                .noneMatch(file -> file.getName().equals(".git"))) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public static GitRepository getRepository(World world) throws IOException {
+        return getRepository(world, "master");
+    }
+
+    public static GitRepository getRepository(World world, String branch) throws IOException {
+        if (isGitWorld(world)) {
+            WVCPlugin plugin = WVCPlugin.getInstance();
+            GHRepository repository = plugin.getGitHub().getRepository("wvc_" + world.getName());
+            if (repository == null) {
+                return null;
+            }
+            return new GitRepository(plugin, repository, world, branch);
+        }
+        return null;
+    }
+
+    public static GitRepository createRepository(World world) {
+        GitCreateAction gitCreateAction = new GitCreateAction();
+        return gitCreateAction.apply(
+                new GitCreateContext(
+                        world
+                )
+        );
+    }
 
     private final WVCPlugin plugin;
     private final GHRepository repository;
@@ -139,6 +179,26 @@ public class GitRepository {
     public String getCommitId() {
         try {
             return repository.getBranch(branch).getSHA1();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Pulls the latest changes from the remote repository
+     */
+    public void pull() {
+        // FIXME: we should unload the world before pulling otherwise the world will be corrupted
+        File worldFolder = world.getWorldFolder();
+        try {
+            Process start = new ProcessBuilder("git", "pull")
+                    .directory(worldFolder).start();
+            // send output to console
+            InputStreamReader inputStreamReader = new InputStreamReader(start.getInputStream());
+            int read;
+            while ((read = inputStreamReader.read()) != -1) {
+                System.out.print((char) read);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
