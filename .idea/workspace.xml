@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4442c85a-c2c3-4cd9-b0d9-869f65d068ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/de/langomatisch/wvc/git/GitRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/de/langomatisch/wvc/git/GitRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/de/langomatisch/wvc/git/action/create/GitCreateAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/de/langomatisch/wvc/git/action/create/GitCreateAction.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +70,7 @@
       <workItem from="1682175183753" duration="947000" />
       <workItem from="1682249004994" duration="288000" />
       <workItem from="1682249302857" duration="149000" />
-      <workItem from="1682249458055" duration="1044000" />
+      <workItem from="1682249458055" duration="1364000" />
     </task>
     <servers />
   </component>

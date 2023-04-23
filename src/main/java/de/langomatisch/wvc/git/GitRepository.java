@@ -82,9 +82,9 @@ public class GitRepository {
             WorldCreator worldCreator = new WorldCreator(repository.getName());
             this.world = worldCreator.createWorld();
         } else {
-            this.world = Bukkit.getWorld("wvc_" + repository.getName());
+            this.world = Bukkit.getWorld(repository.getName());
         }
-        pull();
+        Preconditions.checkNotNull(world, "World cannot be null");
         File worldFolder = world.getWorldFolder();
         if (Arrays.stream(Objects.requireNonNull(worldFolder.listFiles()))
                 .noneMatch(file -> file.getName().equals(".git"))) {
@@ -97,6 +97,16 @@ public class GitRepository {
         }
     }
 
+    public GitRepository(WVCPlugin plugin, GHRepository repository) {
+        this(plugin, repository, "master");
+    }
+
+
+    /**
+     * Clone the remote repository
+     *
+     * @param url the url of the remote repository
+     */
     private void cloneProject(String url) {
         File worldFolder = Bukkit.getWorldContainer();
         try {
@@ -110,10 +120,6 @@ public class GitRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public GitRepository(WVCPlugin plugin, GHRepository repository) {
-        this(plugin, repository, "master");
     }
 
     /**
@@ -218,25 +224,30 @@ public class GitRepository {
     /**
      * Pulls the latest changes from the remote repository
      */
-    public void pull() {
-        // FIXME: we should unload the world before pulling otherwise the world will be corrupted
-        File worldFolder = world.getWorldFolder();
-        // FIXME: we have to make sure there are no changes in the world before pulling
-        //        otherwise the pull will fail
-        Bukkit.unloadWorld(world, false);
-        try {
-            Process start = new ProcessBuilder("git", "pull")
-                    .directory(worldFolder).start();
-            // send output to console
-            InputStreamReader inputStreamReader = new InputStreamReader(start.getInputStream());
-            int read;
-            while ((read = inputStreamReader.read()) != -1) {
-                System.out.print((char) read);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        Bukkit.createWorld(new WorldCreator(world.getName()));
+    public CompletableFuture<Void> pull() {
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    File worldFolder = world.getWorldFolder();
+                    // FIXME: we have to make sure there are no changes in the world before pulling
+                    //        otherwise the pull will fail
+                    Bukkit.unloadWorld(world, false);
+                    try {
+                        Process start = new ProcessBuilder("git", "pull")
+                                .directory(worldFolder).start();
+                        // send output to console
+                        InputStreamReader inputStreamReader = new InputStreamReader(start.getInputStream());
+                        int read;
+                        while ((read = inputStreamReader.read()) != -1) {
+                            System.out.print((char) read);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Bukkit.createWorld(new WorldCreator(world.getName()));
+                    return null;
+                }
+        );
+
     }
 
 }
