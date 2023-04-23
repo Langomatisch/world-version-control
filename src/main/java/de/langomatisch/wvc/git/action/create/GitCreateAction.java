@@ -18,7 +18,7 @@ public class GitCreateAction extends GitAction<GitCreateContext, GitRepository> 
     public GitRepository apply(GitCreateContext context) {
         GHCreateRepositoryBuilder repository = context.getPlugin().getGitHub().createRepository(context.getWorld().getName());
         try {
-            return new GitRepository(context.getPlugin(), repository.create(), context.getWorld());
+            return new GitRepository(context.getPlugin(), repository.create());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
