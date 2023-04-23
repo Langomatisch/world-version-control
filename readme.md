@@ -1,5 +1,7 @@
 # World Version Control
 
+# This is a work in progress. It is not ready for production use.
+
 ## What is it?
 
 World Version Control is a tool for managing the version of your world. 
@@ -19,6 +21,16 @@ World Version Control is a plugin for Spigot and Bukkit. It will create a git re
 5. Edit the `git.json` file in the `plugins/WorldVersionControl` folder.
 6. Start the server.
 7. Enjoy!
+
+## Configuration
+    
+Git.yml:
+
+```json
+    {
+        "apiKey": "YOUR_API_KEY"
+    }
+```
 
 # Ideas
 - [ ] add automatic server preview to pull requests (e.g. `pr-<id>.wvc-plugin.com` or self-hosted from the user.)
